@@ -93,7 +93,6 @@ def extract_answer(response):
     similar_examples = get_similar_examples(row["input"], task_examples, 2)
     random_examples = task_examples.sample(min(3, len(task_examples)), random_state=42)
     few_shot_examples = pd.concat([similar_examples, random_examples]).drop_duplicates()
-3)
 ```
 
 3) 定義任務、Role's Prmpt

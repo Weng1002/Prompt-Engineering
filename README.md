@@ -50,7 +50,7 @@ The ideas expressed by Voltaire, above, best illustrate which of the following c
 
 ![最終成績](最終排名.png)
 
-> 準確率在 0.95719 左右 (越高越精確)
+> 準確率在 0.96108 左右 (越高越精確)
 
 ## 模型介紹
 使用了 **Gemini-2.0-flash** 和 **Gemini-1.5-pro**，利用 **LangChain**。
@@ -87,11 +87,11 @@ def extract_answer(response):
     return random.choice(["A", "B", "C", "D"])
 ```
 
-2) 動態挑選題型
+2) 動態挑選題型，使用 Sentence-BERT ，根據上下文關聯找相似題型
 ```bash
 # 2 個相似範例 + 3 個隨機範例
-    similar_examples = get_similar_examples(row["input"], task_examples, 2)
-    random_examples = task_examples.sample(min(3, len(task_examples)), random_state=42)
+    similar_examples = get_similar_examples(row["input"], task_examples, 3)
+    random_examples = task_examples.sample(min(2, len(task_examples)), random_state=42)
     few_shot_examples = pd.concat([similar_examples, random_examples]).drop_duplicates()
 ```
 
@@ -101,10 +101,7 @@ task_strategy = category_strategies.get(
         task,
         "Implement a comprehensive strategy that leverages detailed domain expertise and rigorous logical reasoning."
     )
-role = role_dict.get(
-        task,
-        "a seasoned expert with extensive domain-specific knowledge and analytical skills"
-    )
+role = role_dict.get(task, "a seasoned expert with extensive domain-specific knowledge")
 ```
 
 4) 定義 few-shot 範例格式
@@ -141,16 +138,16 @@ category_strategies = {
 2) 定義 **role** 種類
 ```bash
 role_dict = {
-    "high_school_biology": "a high school biology teacher",
-    "high_school_computer_science": "a computer science professor",
-    "high_school_european_history": "a European history expert",
-    "high_school_geography": "a geography educator",
-    "high_school_government_and_politics": "a political science scholar",
-    "high_school_macroeconomics": "a macroeconomics professor",
-    "high_school_microeconomics": "a microeconomics professor",
-    "high_school_psychology": "a psychology instructor",
-    "high_school_us_history": "a U.S. history expert",
-    "high_school_world_history": "a world history specialist"
+    "high_school_biology": "a biology professor specializing in high school curricula",
+    "high_school_computer_science": "a computer science professor with expertise in programming logic",
+    "high_school_european_history": "a European history expert focused on high school education",
+    "high_school_geography": "a geography educator specializing in spatial analysis",
+    "high_school_government_and_politics": "a political science scholar with knowledge of governmental systems",
+    "high_school_macroeconomics": "a macroeconomics professor specializing in economic policy",
+    "high_school_microeconomics": "a microeconomics professor focused on market dynamics",
+    "high_school_psychology": "a psychology instructor with expertise in behavioral theories",
+    "high_school_us_history": "a U.S. history expert specializing in key events and trends",
+    "high_school_world_history": "a world history specialist focused on global trends"
 }
 ```
 3) CoT
@@ -158,32 +155,37 @@ role_dict = {
 prompt_template = PromptTemplate(
     template="""
         You are {role} specializing in solving multiple-choice questions with high accuracy. The current question is from {task}.
-        
-        🔹 **Rules**:
-        1. Output only the final answer in this exact format: 'Correct answer: X' (where X is A, B, C, or D).
-        2. Include only the output, avoiding reasoning, justifications, or additional text.
-        3. Think step-by-step internally:
-           - Step 1: Identify the core concept or fact the question is testing.
-           - Step 2: For each option, assess its alignment with the core concept.
-           - Step 3: Eliminate options that contradict or misinterpret the concept, considering why they might be incorrect.
-           - Step 4: Check for potential trickery or common misconceptions in the options.
-           - Step 5: Confirm the remaining option by ensuring it directly answers the question.
-        4. Use these strategies for {task} questions: {task_strategy}.
-        5. Pay attention to subtle differences between options to avoid falling for distractors.
-        6. Double-check your conclusion by revisiting the question and options to ensure accuracy.
 
-        📌 **Examples:**
-        These examples are selected to provide context and illustrate common patterns in {task} questions:
-        {few_shot}
-
-        Now solve this question:
-        
-        Question: {question}
-        A) {A}
-        B) {B}
-        C) {C}
-        D) {D}
-        """,
+            🔹 **Rules**:
+            1. Output only the final answer in this exact format: 'Correct answer: X' (where X is A, B, C, or D).
+            2. Include only the output, avoiding reasoning or additional text.
+            
+            🔹 **Instructions**:
+            Solve the question by reasoning step-by-step:
+            1. Identify the core concept or fact the question is testing.
+            2. Analyze each option:
+               - Assess its alignment with the core concept.
+               - Note why it might be correct or incorrect.
+            3. Eliminate incorrect options:
+               - Identify flaws (e.g., factual errors, misinterpretations).
+               - Watch for traps (e.g., subtle wording differences).
+            4. Confirm the answer:
+               - Ensure the remaining option fully answers the question.
+            
+            🔹 **Strategy**:
+            Use these strategies for {task} questions: {task_strategy}.
+            
+            📌 **Examples**:
+            {few_shot}
+            
+            Now solve this question:
+            
+            Question: {question}
+            A) {A}
+            B) {B}
+            C) {C}
+            D) {D}
+""",
 input_variables=["role", "task", "task_strategy", "few_shot", "question", "A", "B", "C", "D"]
 )
 ```

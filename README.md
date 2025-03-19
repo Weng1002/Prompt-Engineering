@@ -48,9 +48,12 @@ The ideas expressed by Voltaire, above, best illustrate which of the following c
 ---
 競賽連結：[點擊這裡](https://www.kaggle.com/competitions/hw-1-prompt-engineering/overview) 
 
-![最終成績](最終排名.png)
+![最終成績](最終成績.png)
 
 > 準確率在 0.96108 左右 (越高越精確)
+
+ ![最終排名](最終排名.png)
+> 全班共約有125人，排名30名
 
 ## 模型介紹
 使用了 **Gemini-2.0-flash** 和 **Gemini-1.5-pro**，利用 **LangChain**。

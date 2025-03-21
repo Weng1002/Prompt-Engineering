@@ -54,8 +54,9 @@ The ideas expressed by Voltaire, above, best illustrate which of the following c
 
  ![最終排名](最終排名.png)
 > 全班共約有130人，private排名13名
+
  ![最終排名](最終成績_public.png)
-> public排名30名
+> public 排名30名
 
 ## 模型介紹
 使用了 **Gemini-2.0-flash** 和 **Gemini-1.5-pro**，利用 **LangChain**。

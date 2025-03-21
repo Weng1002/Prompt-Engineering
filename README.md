@@ -50,7 +50,7 @@ The ideas expressed by Voltaire, above, best illustrate which of the following c
 
 ![最終成績](最終成績.png)
 
-> Public準確率在 0.96108 ，Private 準確率在 0.95785 (越高越精確)
+> Public 準確率在 0.96108 ，Private 準確率在 0.95785 (越高越精確)
 
  ![最終排名](最終排名.png)
 > 全班共約有130人，private排名13名
